@@ -1,3 +1,4 @@
+import { handleHttpErrors } from "../fetchUtils.js"
 import { SERVER } from "../settings.js"
 
 const SERVER_URL = SERVER + "/api/quotes"
@@ -8,22 +9,36 @@ export function page4Handlers() {
   document.getElementById("btn-delete").onclick = deleteQuote
 }
 
-
-function findQuote() {
+async function findQuote() {
+  document.getElementById("error").innerText = ""
   const id = getIdFromInputField()
-  fetch(`${SERVER_URL}/${id}`)
-    .then(res => {
-      if (!res.ok) {
-        throw new Error("Could not find quote (")
-      }
-      return res.json()
-    })
-    .then(foundQuote => {
-      document.getElementById("quote").value = foundQuote.quote
-      document.getElementById("author").value = foundQuote.ref
-    })
-    .catch(e => alert(e.message + " (NEVER use alerts for real)"))
+  try {
+    const foundQuote = await fetch(`${SERVER_URL}/${id}`)
+      .then(handleHttpErrors)
+
+    document.getElementById("quote").value = foundQuote.quote
+    document.getElementById("author").value = foundQuote.ref
+  }
+  catch (err) {
+    document.getElementById("error").innerText = err.message
+  }
 }
+
+// function findQuote() {
+//   const id = getIdFromInputField()
+//   fetch(`${SERVER_URL}/${id}`)
+//     .then(res => {
+//       if (!res.ok) {
+//         throw new Error("Could not find quote (")
+//       }
+//       return res.json()
+//     })
+//     .then(foundQuote => {
+//       document.getElementById("quote").value = foundQuote.quote
+//       document.getElementById("author").value = foundQuote.ref
+//     })
+//     .catch(e => alert(e.message + " (NEVER use alerts for real)"))
+// }
 
 function editQuote() {
   const id = getIdFromInputField()
