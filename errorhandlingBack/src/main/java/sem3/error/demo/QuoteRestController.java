@@ -55,6 +55,9 @@ public class QuoteRestController {
     if(q==null){
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No quote with provided ID found");
     }
+    if((body.getQuote()== null || body.getQuote().isBlank()) ){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"A value for the Quote must be provided");
+    }
     q.setQuote(body.getQuote());
     q.setRef(body.getRef());
     return q;

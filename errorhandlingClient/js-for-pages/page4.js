@@ -40,15 +40,15 @@ async function findQuote() {
 //     .catch(e => alert(e.message + " (NEVER use alerts for real)"))
 // }
 
-function editQuote() {
+async function editQuote() {
   const id = getIdFromInputField()
   const editedQuote = {
     id: id
   }
   editedQuote.quote = document.getElementById("quote").value
   editedQuote.ref = document.getElementById("author").value
-
-  fetch(SERVER_URL + "/" + id, {
+  try {
+  await fetch(SERVER_URL + "/" + id, {
     method: "PUT",
     headers: {
       "Accept": "application/json",
@@ -56,16 +56,13 @@ function editQuote() {
     },
     body: JSON.stringify(editedQuote)
   })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error("Error while editing the quote")
-      }
-      return res.json()
-    })
-    .then(result => clearFields())
-    .catch(err => alert(err.message + " (NEVER USE ALERT FOR REAL)"))
+    .then(handleHttpErrors)
 
-
+    clearFields();
+  }
+    catch(err) {
+      document.getElementById("error").innerText = err.message
+    }
 }
 async function deleteQuote() {
   const id = getIdFromInputField()
